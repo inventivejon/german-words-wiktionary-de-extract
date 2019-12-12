@@ -138,6 +138,24 @@ header = [
     # Geflügeltes Wort
 ]
 
+def UpdateOrInsertIntoDBGen(table_postfix, column2name, column3name, db, singleWordType, execute_parameters):
+    table = '{}{}'.format(singleWordType.replace(' ', '_'), table_postfix)
+
+    db_result = db.execute('''SELECT id
+                        FROM {}
+                        WHERE lemma=? AND {}=? AND {}=? '''.format(table, column2name, column3name), execute_parameters).fetchone()
+    if db_result is not None and len(db_result)>0:
+        print('UPDATE {} SET lemma=?, {}=?, {}=? WHERE id={}'.format(table, column2name, column3name, db_result[0]), execute_parameters)
+        db.execute('UPDATE {} SET lemma=?, {}=?, {}=? WHERE id={}'.format(table, column2name, column3name, db_result[0]), execute_parameters)
+    else:
+        print("INSERT INTO {} VALUES(NULL,?,?,?)".format(table),execute_parameters)
+        db.execute("INSERT INTO {} VALUES(NULL,?,?,?)".format(table),execute_parameters)
+
+def UpdateOrInsertIntoDB_attr(db, singleWordType, execute_parameters):
+    UpdateOrInsertIntoDBGen("_attr", "Attribute", "Value", db, singleWordType, execute_parameters)
+
+def UpdateOrInsertIntoDB(db, singleWordType, execute_parameters):
+    UpdateOrInsertIntoDBGen("", "Typ", "Wortform", db, singleWordType, execute_parameters)
 
 def create_db_entries(db, data):
     # map dict values to list
@@ -160,29 +178,21 @@ def create_db_entries(db, data):
         db.commit()
 
         for wordType in word_data['pos']:
-            db_execute_parameters = [word_data['lemma'], 'pos', wordType]
-            db.execute("INSERT INTO {}_attr VALUES(NULL,?,?,?)".format(singleWordType.replace(' ', '_')),db_execute_parameters)
+            UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], 'pos', wordType])
             for subAttributePos in word_data['pos'][wordType]:
-                db_execute_parameters = [word_data['lemma'], wordType, subAttributePos]
-                db.execute("INSERT INTO {}_attr VALUES(NULL,?,?,?)".format(singleWordType.replace(' ', '_')),db_execute_parameters)
+                UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], wordType, subAttributePos])
         
         if hasattr(word_data,'inflected'):
-            db_execute_parameters = [word_data['lemma'], 'inflected', word_data['inflected']]
-            db.execute("INSERT INTO {}_attr VALUES(NULL,?,?,?)".format(singleWordType.replace(' ', '_')),db_execute_parameters)
+            UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], 'inflected', word_data['inflected']])
 
         if hasattr(word_data,'language'):
-            db_execute_parameters = [word_data['lemma'], 'language', word_data['language']]
-            db.execute("INSERT INTO {}_attr VALUES(NULL,?,?,?)".format(singleWordType.replace(' ', '_')),db_execute_parameters)
+            UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], 'language', word_data['language']])
 
         for col_name in header:
             if col_name in word_data:
-                db_execute_parameters = [word_data['lemma'], col_name, word_data[col_name]]
-                print(db_execute_parameters)
-                db.execute("INSERT INTO {} VALUES(NULL,?,?,?)".format(singleWordType.replace(' ', '_')),db_execute_parameters)
+                UpdateOrInsertIntoDB(db, singleWordType, [word_data['lemma'], col_name, word_data[col_name]])
             elif 'flexion' in word_data and col_name in word_data['flexion']:
-                db_execute_parameters = [word_data['lemma'], col_name, word_data['flexion'][col_name]]
-                print(db_execute_parameters)
-                db.execute("INSERT INTO {} VALUES(NULL,?,?,?)".format(singleWordType.replace(' ', '_')),db_execute_parameters)
+                UpdateOrInsertIntoDB(db, singleWordType, [word_data['lemma'], col_name, word_data['flexion'][col_name]])
             else:
                 pass
 
