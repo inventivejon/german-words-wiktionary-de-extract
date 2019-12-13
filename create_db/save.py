@@ -4,6 +4,7 @@ import locale
 import csv
 locale.setlocale(locale.LC_ALL, 'deu_deu' if os.name == 'nt' else 'de_DE.UTF-8')
 import sqlite3
+import sys
 
 # from pdb import set_trace as bp
 
@@ -142,13 +143,13 @@ numUpdatedEntries = 0
 numInsertedEntries = 0
 
 def log(handle, content):
-    handle.write(content + '\n')
+    handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
     print(content)
 
 def UpdateOrInsertIntoDBGen(handle, table_postfix, column2name, column3name, db, singleWordType, execute_parameters):
     global numUpdatedEntries
     global numInsertedEntries
-    
+
     table = '{}{}'.format(singleWordType.replace(' ', '_'), table_postfix)
 
     db_result = db.execute('''SELECT *
@@ -212,6 +213,8 @@ def create_db_entries(db, handle, data):
         db.commit()
 
 def save(handle, db_path, data):
+    global numUpdatedEntries
+    global numInsertedEntries
         
     db = sqlite3.connect(db_path)
 

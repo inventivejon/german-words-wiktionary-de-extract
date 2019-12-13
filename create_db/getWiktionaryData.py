@@ -1,9 +1,10 @@
 import hashlib
 import requests
 import os.path
+import sys
 
 def log(handle, content):
-    handle.write(content + '\n')
+    handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
     print(content)
 
 def md5Checksum(filePath,url):

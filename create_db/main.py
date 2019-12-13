@@ -9,12 +9,13 @@ from extend_flexion import extend_flexion
 from save import save
 from getWiktionaryData import DownloadIfNeeded
 import time
+import sys
 
 wiki_url = 'https://dumps.wikimedia.org/dewiktionary/latest/dewiktionary-latest-pages-articles-multistream.xml.bz2'
 bzfile_path = 'dewiktionary-latest-pages-articles-multistream.xml.bz2'
 
 def log(handle, content):
-    handle.write(content + '\n')
+    handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
     print(content)
 
 timestamp = time.strftime("%Y_%m_%d_%H_%M_%S")
