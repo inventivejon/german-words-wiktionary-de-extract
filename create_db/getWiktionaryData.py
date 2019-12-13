@@ -4,9 +4,12 @@ import os.path
 import sys
 
 def log(handle, content):
-    handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
+    try:
+        handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
+    except:
+        pass
     print(content)
-
+    
 def md5Checksum(filePath,url):
     m = hashlib.md5()
     if url==None:

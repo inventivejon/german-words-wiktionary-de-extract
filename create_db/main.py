@@ -15,7 +15,10 @@ wiki_url = 'https://dumps.wikimedia.org/dewiktionary/latest/dewiktionary-latest-
 bzfile_path = 'dewiktionary-latest-pages-articles-multistream.xml.bz2'
 
 def log(handle, content):
-    handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
+    try:
+        handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
+    except:
+        pass
     print(content)
 
 timestamp = time.strftime("%Y_%m_%d_%H_%M_%S")

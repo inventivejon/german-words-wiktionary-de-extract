@@ -143,7 +143,10 @@ numUpdatedEntries = 0
 numInsertedEntries = 0
 
 def log(handle, content):
-    handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
+    try:
+        handle.write(content.encode(sys.stdout.encoding, errors='replace').decode("utf-8") + '\n')
+    except:
+        pass
     print(content)
 
 def UpdateOrInsertIntoDBGen(handle, table_postfix, column2name, column3name, db, singleWordType, execute_parameters):
