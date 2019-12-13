@@ -141,7 +141,11 @@ header = [
 numUpdatedEntries = 0
 numInsertedEntries = 0
 
-def UpdateOrInsertIntoDBGen(table_postfix, column2name, column3name, db, singleWordType, execute_parameters):
+def log(handle, content):
+    handle.write(content)
+    print(content)
+
+def UpdateOrInsertIntoDBGen(handle, table_postfix, column2name, column3name, db, singleWordType, execute_parameters):
     table = '{}{}'.format(singleWordType.replace(' ', '_'), table_postfix)
 
     db_result = db.execute('''SELECT *
@@ -149,21 +153,21 @@ def UpdateOrInsertIntoDBGen(table_postfix, column2name, column3name, db, singleW
                         WHERE lemma=? AND {}=?'''.format(table, column2name), [execute_parameters[0], execute_parameters[1]]).fetchone()
     if db_result is not None and len(db_result)>0:
         if db_result[1] != execute_parameters[0] or db_result[2] != execute_parameters[1] or db_result[3] != execute_parameters[2]:
-            print('Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
+            log(handle, 'Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
             db.execute('UPDATE {} SET lemma=?, {}=?, {}=? WHERE id={}'.format(table, column2name, column3name, db_result[0]), execute_parameters)
             numUpdatedEntries = numUpdatedEntries + 1
     else:
-        print("INSERT INTO {} VALUES(NULL,?,?,?)".format(table),execute_parameters)
+        log(handle, "INSERT INTO {} VALUES(NULL,{},{},{})".format(table,execute_parameters[0],execute_parameters[1],execute_parameters[2]))
         db.execute("INSERT INTO {} VALUES(NULL,?,?,?)".format(table),execute_parameters)
         numInsertedEntries = numInsertedEntries + 1
 
-def UpdateOrInsertIntoDB_attr(db, singleWordType, execute_parameters):
-    UpdateOrInsertIntoDBGen("_attr", "Attribute", "Value", db, singleWordType, execute_parameters)
+def UpdateOrInsertIntoDB_attr(handle, db, singleWordType, execute_parameters):
+    UpdateOrInsertIntoDBGen(handle, "_attr", "Attribute", "Value", db, singleWordType, execute_parameters)
 
-def UpdateOrInsertIntoDB(db, singleWordType, execute_parameters):
-    UpdateOrInsertIntoDBGen("", "Typ", "Wortform", db, singleWordType, execute_parameters)
+def UpdateOrInsertIntoDB(handle, db, singleWordType, execute_parameters):
+    UpdateOrInsertIntoDBGen(handle, "", "Typ", "Wortform", db, singleWordType, execute_parameters)
 
-def create_db_entries(db, data):
+def create_db_entries(db, handle, data):
     # map dict values to list
     for word_data in data:
         
@@ -175,7 +179,7 @@ def create_db_entries(db, data):
                 break
 
         if singleWordType == 'empty':
-            print("ERROR: No WordType selected")
+            log(handle, "ERROR: No WordType selected")
             continue
 
         db.execute('CREATE TABLE IF NOT EXISTS {} (id INTEGER PRIMARY KEY AUTOINCREMENT, lemma VARCHAR(250), Typ VARCHAR(250), Wortform VARCHAR(250))'.format(singleWordType.replace(' ', '_')))
@@ -184,35 +188,37 @@ def create_db_entries(db, data):
         db.commit()
 
         for wordType in word_data['pos']:
-            UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], 'pos', wordType])
+            UpdateOrInsertIntoDB_attr(handle, db, singleWordType, [word_data['lemma'], 'pos', wordType])
             for subAttributePos in word_data['pos'][wordType]:
-                UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], wordType, subAttributePos])
+                UpdateOrInsertIntoDB_attr(handle, db, singleWordType, [word_data['lemma'], wordType, subAttributePos])
         
         if hasattr(word_data,'inflected'):
-            UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], 'inflected', word_data['inflected']])
+            UpdateOrInsertIntoDB_attr(handle, db, singleWordType, [word_data['lemma'], 'inflected', word_data['inflected']])
 
         if hasattr(word_data,'language'):
-            UpdateOrInsertIntoDB_attr(db, singleWordType, [word_data['lemma'], 'language', word_data['language']])
+            UpdateOrInsertIntoDB_attr(handle, db, singleWordType, [word_data['lemma'], 'language', word_data['language']])
 
         for col_name in header:
             if col_name in word_data:
-                UpdateOrInsertIntoDB(db, singleWordType, [word_data['lemma'], col_name, word_data[col_name]])
+                UpdateOrInsertIntoDB(handle, db, singleWordType, [word_data['lemma'], col_name, word_data[col_name]])
             elif 'flexion' in word_data and col_name in word_data['flexion']:
-                UpdateOrInsertIntoDB(db, singleWordType, [word_data['lemma'], col_name, word_data['flexion'][col_name]])
+                UpdateOrInsertIntoDB(handle, db, singleWordType, [word_data['lemma'], col_name, word_data['flexion'][col_name]])
             else:
                 pass
 
         db.commit()
 
-def save(db_path, data):
+def save(handle, db_path, data):
         
     db = sqlite3.connect(db_path)
 
-    create_db_entries(db, data)
+    create_db_entries(db, handle, data)
 
     db.commit()
 
     db.close()
 
-    print("Total number updated entries {}".format(numUpdatedEntries))
-    print("Total number inserted entries {}".format(numInsertedEntries))
+    log(handle, "Total number updated entries {}".format(numUpdatedEntries))
+    log(handle, "Total number inserted entries {}".format(numInsertedEntries))
+
+    handle.close()
