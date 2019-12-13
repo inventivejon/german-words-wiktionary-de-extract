@@ -175,9 +175,11 @@ def UpdateOrInsertIntoDB(handle, db, singleWordType, execute_parameters):
     UpdateOrInsertIntoDBGen(handle, "", "Typ", "Wortform", db, singleWordType, execute_parameters)
 
 def create_db_entries(db, handle, data):
+    numDataEntries = len(data)
+    log(handle, "Processing {} data entries".format(numDataEntries))
     # map dict values to list
-    for word_data in data:
-        
+    for index, word_data in data:
+        log(handle, "Processing: {}/{}".format(index,numDataEntries))
         singleWordType = 'empty'
 
         for wordType in word_data['pos']:
