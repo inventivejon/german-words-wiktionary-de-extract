@@ -7,7 +7,10 @@ In case the file was downloaded before by the application itself it will not dow
 In case a local.db already exists new entries will be inserted in case they don't exist yet. If an entry already exists it will be updated with the new value and the need for update will be displayed in the console output. In general the console output only contains changes done on the database.
 
 # Source
-This project is based on https://github.com/gambolputty/german-nouns.
+This project is based on https://github.com/gambolputty/german-nouns and https://github.com/gambolputty/wiktionary_de_parser.
+
+Compiled from [WiktionaryDE](https://de.wiktionary.org)
+License: [Creative Commons Attribution-ShareAlike 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/deed.en).
 
 # Execution time
 A full run approximately takes about 2 days.
