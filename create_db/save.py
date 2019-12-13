@@ -138,18 +138,24 @@ header = [
     # Geflügeltes Wort
 ]
 
+numUpdatedEntries = 0
+numInsertedEntries = 0
+
 def UpdateOrInsertIntoDBGen(table_postfix, column2name, column3name, db, singleWordType, execute_parameters):
     table = '{}{}'.format(singleWordType.replace(' ', '_'), table_postfix)
 
-    db_result = db.execute('''SELECT id
+    db_result = db.execute('''SELECT *
                         FROM {}
-                        WHERE lemma=? AND {}=? AND {}=? '''.format(table, column2name, column3name), execute_parameters).fetchone()
+                        WHERE lemma=? AND {}=?'''.format(table, column2name), [execute_parameters[0], execute_parameters[1]]).fetchone()
     if db_result is not None and len(db_result)>0:
-        print('UPDATE {} SET lemma=?, {}=?, {}=? WHERE id={}'.format(table, column2name, column3name, db_result[0]), execute_parameters)
-        db.execute('UPDATE {} SET lemma=?, {}=?, {}=? WHERE id={}'.format(table, column2name, column3name, db_result[0]), execute_parameters)
+        if db_result[1] != execute_parameters[0] or db_result[2] != execute_parameters[1] or db_result[3] != execute_parameters[2]:
+            print('Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
+            db.execute('UPDATE {} SET lemma=?, {}=?, {}=? WHERE id={}'.format(table, column2name, column3name, db_result[0]), execute_parameters)
+            numUpdatedEntries = numUpdatedEntries + 1
     else:
         print("INSERT INTO {} VALUES(NULL,?,?,?)".format(table),execute_parameters)
         db.execute("INSERT INTO {} VALUES(NULL,?,?,?)".format(table),execute_parameters)
+        numInsertedEntries = numInsertedEntries + 1
 
 def UpdateOrInsertIntoDB_attr(db, singleWordType, execute_parameters):
     UpdateOrInsertIntoDBGen("_attr", "Attribute", "Value", db, singleWordType, execute_parameters)
@@ -207,3 +213,6 @@ def save(db_path, data):
     db.commit()
 
     db.close()
+
+    print("Total number updated entries {}".format(numUpdatedEntries))
+    print("Total number inserted entries {}".format(numInsertedEntries))
