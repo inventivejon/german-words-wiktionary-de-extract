@@ -21,6 +21,8 @@ def log(handle, content):
         pass
     print(content)
 
+start_time = time.time()
+
 timestamp = time.strftime("%Y_%m_%d_%H_%M_%S")
 handle = open("log_main_py_{}.txt".format(timestamp), 'w+')
 
@@ -56,5 +58,11 @@ log(handle, "Index {} reached".format(index))
 save(handle, 'local.db', data)
 
 log(handle, f'Saved {len(data)} records')
+
+elapsed_time = time.time() - start_time
+
+log(handle, f'Saved {len(data)} records')
+
+log(handle, "Execution time: {}".format(time.strftime('%H:%M:%S', elapsed_time)))
 
 handle.close()
