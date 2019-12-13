@@ -14,7 +14,7 @@ wiki_url = 'https://dumps.wikimedia.org/dewiktionary/latest/dewiktionary-latest-
 bzfile_path = 'dewiktionary-latest-pages-articles-multistream.xml.bz2'
 
 def log(handle, content):
-    handle.write(content)
+    handle.write(content + '\n')
     print(content)
 
 timestamp = time.strftime("%Y_%m_%d_%H_%M_%S")
@@ -52,3 +52,5 @@ log(handle, "Index {} reached".format(index))
 save(handle, 'local.db', data)
 
 log(handle, f'Saved {len(data)} records')
+
+handle.close()

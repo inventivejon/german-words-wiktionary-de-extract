@@ -142,10 +142,13 @@ numUpdatedEntries = 0
 numInsertedEntries = 0
 
 def log(handle, content):
-    handle.write(content)
+    handle.write(content + '\n')
     print(content)
 
 def UpdateOrInsertIntoDBGen(handle, table_postfix, column2name, column3name, db, singleWordType, execute_parameters):
+    global numUpdatedEntries
+    global numInsertedEntries
+    
     table = '{}{}'.format(singleWordType.replace(' ', '_'), table_postfix)
 
     db_result = db.execute('''SELECT *
@@ -220,5 +223,3 @@ def save(handle, db_path, data):
 
     log(handle, "Total number updated entries {}".format(numUpdatedEntries))
     log(handle, "Total number inserted entries {}".format(numInsertedEntries))
-
-    handle.close()

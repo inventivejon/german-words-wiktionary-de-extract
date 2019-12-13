@@ -3,7 +3,7 @@ import requests
 import os.path
 
 def log(handle, content):
-    handle.write(content)
+    handle.write(content + '\n')
     print(content)
 
 def md5Checksum(filePath,url):
@@ -34,15 +34,17 @@ def DownloadNotNeeded(handle, filename, url):
     # Check based on header field Last-Modified - Tue, 03 Dec 2019 07:02:38 GMT
     lastmodified_remote = ''
     try:
-        handle = open(filename_lastmodified, 'r')
-        lastmodified_local = handle.read()
-        handle.close()
+        handle_lastmodified = open(filename_lastmodified, 'r')
+        lastmodified_local = handle_lastmodified.read()
+        handle_lastmodified.close()
         log(handle, "Found local lastmodified information {}".format(lastmodified_local))
         response = requests.head(url)
         lastmodified_remote = response.headers['Last-Modified']
         log(handle, "Found remote lastmodified information {}".format(lastmodified_remote))
         if lastmodified_local == lastmodified_remote:
             return True
+        else:
+            log(handle, "Local version {} is different from remote version {}".format(lastmodified_local, lastmodified_remote))
     except:
         pass
     return False
@@ -58,6 +60,7 @@ def DownloadIfNeeded(handle, filename, url):
         except:
             log(handle, "Remote check failed")
             pass
+    log(handle, "Version is not the same or file does not exist.")
     filename_lastmodified = filename + '_lastmodified'
     try:
         log(handle, "Removing old file if necessary")
