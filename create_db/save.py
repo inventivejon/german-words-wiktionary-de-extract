@@ -178,7 +178,9 @@ def create_db_entries(db, handle, data):
     numDataEntries = len(data)
     log(handle, "Processing {} data entries".format(numDataEntries))
     # map dict values to list
-    for index, word_data in data:
+    index = 0
+    for word_data in data:
+        index = index + 1
         log(handle, "Processing: {}/{}".format(index,numDataEntries))
         singleWordType = 'empty'
 
