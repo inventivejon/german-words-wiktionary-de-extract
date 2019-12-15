@@ -174,14 +174,18 @@ def UpdateOrInsertIntoDB_attr(handle, db, singleWordType, execute_parameters):
 def UpdateOrInsertIntoDB(handle, db, singleWordType, execute_parameters):
     UpdateOrInsertIntoDBGen(handle, "", "Typ", "Wortform", db, singleWordType, execute_parameters)
 
-def create_db_entries(db, handle, data):
+def create_db_entries(db, handle, data):#
+    global numUpdatedEntries
+    global numInsertedEntries
+
     numDataEntries = len(data)
     log(handle, "Processing {} data entries".format(numDataEntries))
     # map dict values to list
     index = 0
     for word_data in data:
         index = index + 1
-        log(handle, "Processing: {}/{}".format(index,numDataEntries))
+        log(handle, "Processing: {}/{} So far: {} inserted and {} updated".format(index,numDataEntries,numInsertedEntries,numUpdatedEntries))
+        
         singleWordType = 'empty'
 
         for wordType in word_data['pos']:
@@ -198,8 +202,10 @@ def create_db_entries(db, handle, data):
         
         db.commit()
 
+        wordTypeIndex = 0
         for wordType in word_data['pos']:
-            UpdateOrInsertIntoDB_attr(handle, db, singleWordType, [word_data['lemma'], 'pos', wordType])
+            wordTypeIndex = wordTypeIndex + 1
+            UpdateOrInsertIntoDB_attr(handle, db, singleWordType, [word_data['lemma'], 'pos' if wordTypeIndex == 0 else 'pos{}'.format(wordTypeIndex), wordType])
             for subAttributePos in word_data['pos'][wordType]:
                 UpdateOrInsertIntoDB_attr(handle, db, singleWordType, [word_data['lemma'], wordType, subAttributePos])
         
