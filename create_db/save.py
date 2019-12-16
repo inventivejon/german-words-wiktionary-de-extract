@@ -157,13 +157,11 @@ def UpdateOrInsertIntoDBGen(handle, table_postfix, column2name, column3name, db,
 
     db_result = db.execute('''SELECT *
                         FROM {}
-                        WHERE lemma=? AND {}=?'''.format(table, column2name), [execute_parameters[0], execute_parameters[1]]).fetchone()
+                        WHERE lemma=? AND {}=? AND {}=?'''.format(table, column2name, column3name), [execute_parameters[0], execute_parameters[1], execute_parameters[2]]).fetchone()
     if db_result is not None and len(db_result)>0:
-        if db_result[1] != execute_parameters[0] or db_result[2] != execute_parameters[1] or db_result[3] != execute_parameters[2]:
-            log(handle, 'Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
-            db.execute('UPDATE {} SET lemma=?, {}=?, {}=? WHERE id={}'.format(table, column2name, column3name, db_result[0]), execute_parameters)
-            numUpdatedEntries = numUpdatedEntries + 1
-    else:
+        # log(handle, 'Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
+        numUpdatedEntries = numUpdatedEntries + 1
+    elif execute_parameters[2] is not None and execute_parameters[2] != 'None':
         log(handle, "INSERT INTO {} VALUES(NULL,{},{},{})".format(table,execute_parameters[0],execute_parameters[1],execute_parameters[2]))
         db.execute("INSERT INTO {} VALUES(NULL,?,?,?)".format(table),execute_parameters)
         numInsertedEntries = numInsertedEntries + 1
