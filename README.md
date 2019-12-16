@@ -4,7 +4,7 @@ This project automatically downloads the newest wictionary blob and extracts all
 The file needs to be named dewiktionary-latest-pages-articles-multistream.xml.bz2 on root folder. Additionally a file named dewiktionary-latest-pages-articles-multistream.xml.bz2_lastmodified need to be placed next to the other file with the content schema: "Tue, 03 Dec 2019 07:02:38 GMT". The correct content is the last updated information from the wiktionary blob.
 In case the file was downloaded before by the application itself it will not download the file again. But in case it detects a newer version of the blob on the wiktionary page it will download and update.
 ## I already have a local.db from a previous run
-In case a local.db already exists new entries will be inserted in case they don't exist yet. If an entry already exists it will be updated with the new value and the need for update will be displayed in the console output. In general the console output only contains changes done on the database.
+In case a local.db already exists new entries will be inserted in case they don't exist yet. If an entry already exists but with a different value it still will be inserted with the new value into the database. If an entry exists with the same value no additional entry will be inserted (avoid duplicate entries). In general the console output only contains changes done on the database.
 
 # Source
 This project is based on https://github.com/gambolputty/german-nouns and https://github.com/gambolputty/wiktionary_de_parser.
