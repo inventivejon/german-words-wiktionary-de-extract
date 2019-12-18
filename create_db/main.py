@@ -63,6 +63,10 @@ elapsed_time = time.time() - start_time
 
 log(handle, f'Saved {len(data)} records')
 
-log(handle, "Execution time: {}".format(time.strftime('%H:%M:%S', elapsed_time)))
+elapsed_hours, elapsed_remainder = divmod(elapsed_time, 3600)
+elapsed_minutes, elapsed_seconds = divmod(elapsed_remainder, 60)
+
+formattedTimeString = "{}:{}:{}".format(round(elapsed_hours), round(elapsed_minutes), round(elapsed_seconds))
+log(handle, "Execution time (hh:mm:ss): {}".format(formattedTimeString))
 
 handle.close()
