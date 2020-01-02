@@ -12,7 +12,7 @@ header = [
     # Nomen
     # 'id',
     'lemma',
-    'pos'
+    #'pos',
     'genus',
     'genus 1',
     'genus 2',
