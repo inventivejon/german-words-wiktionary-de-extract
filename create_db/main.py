@@ -7,6 +7,7 @@ from pprint import pprint
 from wiktionary_de_parser import Parser
 from extend_flexion import extend_flexion
 from save import save
+from PostprocessDB import performAllPostprocessingDBOperations
 from getWiktionaryData import DownloadIfNeeded
 import time
 import sys
@@ -62,6 +63,14 @@ log(handle, f'Saved {len(data)} records')
 elapsed_time = time.time() - start_time
 
 log(handle, f'Saved {len(data)} records')
+
+elapsed_hours, elapsed_remainder = divmod(elapsed_time, 3600)
+elapsed_minutes, elapsed_seconds = divmod(elapsed_remainder, 60)
+
+formattedTimeString = "{}:{}:{}".format(round(elapsed_hours), round(elapsed_minutes), round(elapsed_seconds))
+log(handle, "Execution time (hh:mm:ss): {}".format(formattedTimeString))
+
+performAllPostprocessingDBOperations(handle, 'local.db')
 
 elapsed_hours, elapsed_remainder = divmod(elapsed_time, 3600)
 elapsed_minutes, elapsed_seconds = divmod(elapsed_remainder, 60)

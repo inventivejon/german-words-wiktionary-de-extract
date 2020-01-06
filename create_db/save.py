@@ -157,7 +157,7 @@ def UpdateOrInsertIntoDBGen(handle, table_postfix, column2name, column3name, db,
 
     db_result = db.execute('''SELECT *
                         FROM {}
-                        WHERE lemma=? AND {}=? AND {}=?'''.format(table, column2name, column3name), [execute_parameters[0], execute_parameters[1], execute_parameters[2]]).fetchone()
+                        WHERE lemma=? AND {} LIKE ? AND {}=?'''.format(table, column2name, column3name), [execute_parameters[0], execute_parameters[1], execute_parameters[2]]).fetchone()
     if db_result is not None and len(db_result)>0:
         # log(handle, 'Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
         numUpdatedEntries = numUpdatedEntries + 1
