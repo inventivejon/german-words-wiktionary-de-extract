@@ -4,7 +4,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.8.0] - 2019-12-01
+### Fixed
+- `MANIFEST.in` added langcode files
+
+## [0.7.9] - 2019-12-01
+### Fixed
+- `syllables.py` improvemed syllables parsing
+### Added
+- `language.py` added field `langCode` (providing ISO639-1 language code)
+### Changed
+- `language.py` renamed field `language` to `lang`
+- `README.md` updated readme
+
+## [0.7.8] - 2019-12-01
+### Fixed
+- `ipa.py` IPA parsing improvement
+
+## [0.7.7] - 2019-07-16
+### Fixed
+- `pos.py` added 'Deklinierte Form' as POS (can be Substantiv, Adjektiv, Artikel, Pronomen)
+
+## [0.7.6] - 2019-07-13
+### Fixed
+- `ipa.py` Match correct paragraph in WikiText for parsing IPA
+
+## [0.7.5] - 2019-07-13
+### Fixed
+- `syllables.py` Improved syllables parsing
+
+## [0.7.4] - 2019-07-13
+### Changed
+- `ipa.py` Make IPA field a `list` (support multiple IPA transcriptions for one word)
+
+### Fixed
+- `ipa.py` Improved IPA parsing
+
+## [0.7.3] - 2019-05-29
+### Fixed
+- `pos.py` Prevent duplicate POS names
+
+## [0.7.2] - 2019-05-29
+### Fixed
+- `pos.py` Toponym was a Dict key, when Template 'Deutsch Toponym Übersicht' was present (should be nested noun value)
+
+## [0.7.1] - 2019-05-27
+### Added
+- [Python package](https://pypi.org) support
+
+### Changed
+- repository structure
+- README.md
 
 ## [0.6.6] - 2019-04-14
 ### Added

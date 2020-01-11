@@ -2,21 +2,18 @@
 `wiktionary_de_parser` is a Python module to extract data from German Wiktionary XML files. It allows you to add your own extraction methods.
 
 ## Requirements
-- Python 3+ (tested with 3.7)
-- [pyphen](https://pyphen.org)
+- Python 3.7 (might work with other 3.+ versions, but not tested)
 
 ## Features
-
 - comes with preset extraction methods for:
-  - flexion tables, genus, IPA, language, lemma, part of speech, syllables, raw Wikitext
+  - flexion tables, genus, IPA, language, lemma, part of speech (basic), syllables, raw Wikitext
 - allows you to add your own extraction methods (pass them as argument)
 - data values are normalized and cleaned from obsolete Wikitext markup
-- yields per entry, not per page (a word can have multiple meanings, which is why some Wiktionary pages have multiple entries, called 'sections')
+- yields per section, not per page (a word can have multiple meanings, which is why some Wiktionary pages have multiple 'sections')
 
 ## Usage
-
-1. Install [pyphen](https://pyphen.org) via `pip install pyphen`.
-2. Clone this repository to your project and import `wiktionary_de_parser` like this:
+1. Install via `pip3 install wiktionary_de_parser`.
+2. Import `wiktionary_de_parser` like this:
 
 ```python
 from bz2file import BZ2File
@@ -26,19 +23,18 @@ bzfile_path = 'C:/Users/Gregor/Downloads/dewiktionary-latest-pages-articles-mult
 bz = BZ2File(bzfile_path)
 
 for record in Parser(bz):
-    if record['language'] != 'de':
+    if 'langCode' not in record or record['langCode'] != 'de':
       continue
     # do stuff with 'record'
 ```
 Note: in this example we use [BZ2File](https://pypi.org/project/bz2file/) to read a compressed Wiktionary dump file.
-The dump file is obtained from [here](https://dumps.wikimedia.org/dewiktionary/).
+The Wiktionary dump file is obtained from [here](https://dumps.wikimedia.org/dewiktionary/).
 
 ### Adding new extraction methods
-
 All extraction methods must return a `Dict()` and accept the following arguments:
 - `title` (_string_): The title of the current Wiktionary page
 - `text` (_string_): The [Wikitext](https://en.wikipedia.org/wiki/Wiki#Editing) of the current word entry/section
-- `current_record` (_Dict_): A dictionary with all values of the current iteration (e. g. `current_record['language']`)
+- `current_record` (_Dict_): A dictionary with all values of the current iteration (e. g. `current_record['langCode']`)
 
 ```python
 # Create a new extraction method
@@ -63,8 +59,9 @@ for record in Parser(bz, custom_methods=[my_method]):
              'Nominativ Plural': 'Trittbrettfahrer',
              'Nominativ Singular': 'Trittbrettfahrer'},
  'inflected': False,
- 'ipa': 'ˈtʁɪtbʁɛtˌfaːʁɐ',
- 'language': 'Deutsch',
+ 'ipa': ['ˈtʁɪtbʁɛtˌfaːʁɐ'],
+ 'lang': 'Deutsch',
+ 'langCode': 'de',
  'lemma': 'Trittbrettfahrer',
  'pos': {'Substantiv': []},
  'syllables': ['Tritt', 'brett', 'fah', 'rer'],
@@ -131,6 +128,10 @@ for record in Parser(bz, custom_methods=[my_method]):
              '\n'
              '{{Quellen}}'}
 ```
+
+## Vendor packages
+- [lxml](https://lxml.de)
+- [pyphen](https://pyphen.org)
 
 ## License
 [MIT](https://github.com/gambolputty/wiktionary_de_parser/blob/master/LICENSE.md) © Gregor Weichbrodt

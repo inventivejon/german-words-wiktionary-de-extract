@@ -44,7 +44,7 @@ for record in Parser(bz, custom_methods=[extend_flexion]):
     if re.search(r'{{Alte Schreibweise\|[^}]+}}', record['wikitext']):
         continue
 
-    if 'language' not in record or record['language'].lower() != 'deutsch':
+    if ('lang' not in record or record['lang'].lower() != 'deutsch') and ('language' not in record or record['language'].lower() != 'deutsch') and ('langCode' not in record or record['langCode'].lower() != 'de'):
         continue
 
     if 'pos' not in record:
