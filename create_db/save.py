@@ -109,6 +109,9 @@ header = [
     # Pronomen
 
     # Adjektiv
+    'positiv',
+    'komparativ',
+    'superlativ',
 
     # Partikel
 
@@ -154,12 +157,10 @@ def UpdateOrInsertIntoDBGen(handle, table_postfix, column2name, column3name, db,
     global numInsertedEntries
 
     table = '{}{}'.format(singleWordType.replace(' ', '_'), table_postfix)
-
-    db_result = db.execute('''SELECT *
-                        FROM {}
-                        WHERE lemma=? AND {} LIKE ? AND {}=?'''.format(table, column2name, column3name), [execute_parameters[0], execute_parameters[1], execute_parameters[2]]).fetchone()
+    log(handle,'SELECT * FROM {} WHERE lemma={} AND {}={} AND {}={}'.format(table, execute_parameters[0], column2name, execute_parameters[1], column3name, execute_parameters[2]))
+    db_result = db.execute('SELECT * FROM {} WHERE lemma=? AND {} LIKE ? AND {}=?'.format(table, column2name, column3name), [execute_parameters[0], execute_parameters[1], execute_parameters[2]]).fetchone()
     if db_result is not None and len(db_result)>0:
-        # log(handle, 'Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
+        log(handle, 'Changing value in table {} for id {} from {} {} {} to {} {} {}'.format(table, db_result[0], db_result[1], db_result[2], db_result[3], execute_parameters[0], execute_parameters[1], execute_parameters[2]))
         numUpdatedEntries = numUpdatedEntries + 1
     elif execute_parameters[2] is not None and execute_parameters[2] != 'None':
         log(handle, "INSERT INTO {} VALUES(NULL,{},{},{})".format(table,execute_parameters[0],execute_parameters[1],execute_parameters[2]))
@@ -172,7 +173,7 @@ def UpdateOrInsertIntoDB_attr(handle, db, singleWordType, execute_parameters):
 def UpdateOrInsertIntoDB(handle, db, singleWordType, execute_parameters):
     UpdateOrInsertIntoDBGen(handle, "", "Typ", "Wortform", db, singleWordType, execute_parameters)
 
-def create_db_entries(db, handle, data):#
+def create_db_entries(db, handle, data):
     global numUpdatedEntries
     global numInsertedEntries
 
@@ -181,6 +182,7 @@ def create_db_entries(db, handle, data):#
     # map dict values to list
     index = 0
     for word_data in data:
+        log(handle, "{}".format(word_data['flexion'] if hasattr(word_data, 'flexion') else ""))
         index = index + 1
         log(handle, "Processing: {}/{} So far: {} inserted and {} updated".format(index,numDataEntries,numInsertedEntries,numUpdatedEntries))
         
