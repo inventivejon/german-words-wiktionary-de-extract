@@ -18,7 +18,7 @@ Pyphen==0.9.5
 PySocks==1.7.1
 requests==2.22.0
 six==1.13.0
-urllib3==1.25.7
+urllib3==1.26.5
 win-inet-pton==1.1.0
 wincertstore==0.2
 wrapt==1.11.2
